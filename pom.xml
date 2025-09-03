@@ -294,7 +294,7 @@
 
                         <!-- Javadoc 등의 특정 패턴에서 포맷팅 제외 -->
                         <licenseHeader>
-                            <content>/* (C)$YEAR */</content>  <!-- 예시: 저작권 헤더는 건드리지 않음 -->
+                            <content>/* (C) $YEAR HMM Corp. All rights reserved. */</content>
                         </licenseHeader>
                     </java>
                 </configuration>

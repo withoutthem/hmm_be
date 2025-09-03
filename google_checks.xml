@@ -93,18 +93,8 @@
         <module name="AvoidStarImport">
             <property name="severity" value="error"/>
         </module>
-        <!-- (참고) ImportOrder는 Spotless가 자동으로 처리하므로, Checkstyle에서는 검사만 수행합니다. -->
-        <module name="ImportOrder">
-            <property name="groups" value="java,javax,org,com"/>
-            <property name="ordered" value="true"/>
-            <property name="separated" value="false"/> <!-- Spotless와의 충돌을 피하기 위해 그룹 간 빈 줄 강제는 끕니다. -->
-            <property name="sortStaticImportsAlphabetically" value="true"/>
-        </module>
 
         <!-- ================= 공백/괄호/중괄호 스타일 ================= -->
-        <module name="EmptyLineSeparator">
-            <property name="allowNoEmptyLineBetweenFields" value="true"/>
-        </module>
         <module name="MethodParamPad"/>
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
