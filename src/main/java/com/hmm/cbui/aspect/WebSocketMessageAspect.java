@@ -1,4 +1,4 @@
-/* (C)2025 */
+/* (C) 2025 HMM Corp. All rights reserved. */
 package com.hmm.cbui.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;

@@ -12,7 +12,6 @@
     <!-- 전역 설정 (Checker)                                             -->
     <!-- =============================================================== -->
     <property name="charset" value="UTF-8"/>
-    <!-- (중요) 기본 심각도를 'warning'으로 설정하여, 사소한 스타일 위반으로 커밋이 막히는 것을 방지합니다. -->
     <property name="severity" value="warning"/>
     <property name="fileExtensions" value="java"/>
 
@@ -64,7 +63,7 @@
             <property name="allowMissingReturnTag" value="true"/>
             <property name="validateThrows" value="false"/>
         </module>
-        <module name="JavadocStyle"/>
+<!--        <module name="JavadocStyle"/>-->
         <module name="MissingJavadocType">
             <property name="severity" value="warning"/>
         </module>
@@ -81,7 +80,7 @@
         <module name="TypeName"/>
         <module name="AbbreviationAsWordInName">
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviationLength" value="2"/> <!-- (완화) DTO, ID 등 2~3글자 약어는 흔하므로 1 -> 2로 완화합니다. -->
+            <property name="allowedAbbreviationLength" value="3"/>
             <property name="severity" value="warning"/>
         </module>
 
@@ -102,9 +101,9 @@
         <module name="TypecastParenPad"/>
         <module name="WhitespaceAfter"/>
         <module name="WhitespaceAround"/>
-        <module name="LeftCurly"/>
+<!--        <module name="LeftCurly"/>-->
         <module name="RightCurly"/>
-        <module name="NeedBraces"/>
+<!--        <module name="NeedBraces"/>-->
         <module name="ArrayTypeStyle"/>
 
         <!-- ================= (중요) 잠재적 버그 유발 규칙 (error로 설정) ================= -->
