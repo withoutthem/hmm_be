@@ -1,6 +1,7 @@
 # =====================================================================
 # Husky pre-commit hook (BE 전용 레포)
-# - BE: Docker(Compose) 컨테이너에서 Maven 정적분석(Checkstyle/PMD)
+# - BE: Docker(Compose) 컨테이너에서 Maven 포맷/정적분석
+#   1) Spotless(자동수정) → 2) Checkstyle/PMD(검증)
 # =====================================================================
 
 set -euo pipefail
@@ -10,44 +11,53 @@ log()   { printf "\033[36m%s\033[0m\n" "$*"; }
 ok()    { printf "✅ \033[32m%s\033[0m\n" "$*"; }
 warn()  { printf "⚠️  \033[33m%s\033[0m\n" "$*"; }
 fail()  { printf "❌ \033[31m%s\033[0m\n" "$*" >&2; exit 1; }
-error() { printf "❌ \033[31m%s\033[0m\n" "$*" >&2; }
 divider(){ printf "\n\033[35m──────────────────────────────────────────────\033[0m\n\n"; }
 
-# 항상 프로젝트 루트(HMM)에서 실행되도록 보장
-REPO_ROOT=$(git rev-parse --show-toplevel)
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 cd "$REPO_ROOT"
 
 divider
 log "🚀 Husky pre-commit Hook 시작 (Backend)"
 
-# --------------- BE Static Analysis (Docker) -------------------------
-divider
-log "🛠 [Step 1] Java 정적분석 (Maven in Docker: Checkstyle/PMD)"
+# 0) 스테이지 대상에 Java/POM 변경이 없으면 건너뜀
+CHANGED="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^(backend/|pom\.xml$|^src/|^configuration/).*' || true)"
+if [ -z "$CHANGED" ]; then
+  warn "스테이지된 Java/Maven 관련 변경이 없어 검증을 건너뜁니다."
+  ok   "빠른 통과"
+  divider
+  exit 0
+fi
 
+# 1) Docker / Compose 점검
 command -v docker >/dev/null 2>&1 || fail "Docker가 필요합니다."
 docker compose version >/dev/null 2>&1 || fail "Docker Compose가 필요합니다."
 
-# 루트 기준에서 infra/docker-compose.yml 경로를 사용하도록 수정
 COMPOSE_FILE="infra/docker-compose.yml"
-[ -f "$COMPOSE_FILE" ] || fail "compose 파일을 찾을 수 없습니다. ($COMPOSE_FILE 경로 확인)"
+[ -f "$COMPOSE_FILE" ] || fail "compose 파일을 찾을 수 없습니다: $COMPOSE_FILE"
 docker compose -f "$COMPOSE_FILE" config >/dev/null || fail "compose 구성 오류"
 
-# 루트 기준에서 pom.xml 확인
-if [ -f "pom.xml" ]; then
-  # (수정됨) mvn 명령어에서 -q 옵션 제거
-  if ! docker compose -f "$COMPOSE_FILE" run --rm --remove-orphans -T code-quality \
-        bash -lc 'mvn -f /workspace/pom.xml -DskipTests \
-          -Dcheckstyle.skip=false -Dpmd.skip=false \
-          clean verify'
-  then
-    error "Java 정적분석 실패 → 커밋 차단"
-    echo "─── PMD 요약 ───"
-    PMD_SUMMARY_LIMIT=100 ./scripts/pmd-summary.sh || true
-    echo "📄 상세: target/site/pmd.html 또는 target/pmd.xml"
-    exit 1
+# 2) Spotless: 자동 포맷 (validate에 바인딩되어 있으나, 명시적으로도 한번 실행)
+divider
+log "🧹 [Step 1] Java 자동수정 (Spotless apply)"
+docker compose -f "$COMPOSE_FILE" run --rm --remove-orphans -T code-quality \
+  bash -lc 'mvn -f /workspace/pom.xml -DskipTests spotless:apply' \
+  || fail "Spotless 적용 실패"
+
+# 3) Checkstyle / PMD: 검증
+divider
+log "🛡 [Step 2] Checkstyle / PMD 검증"
+if ! docker compose -f "$COMPOSE_FILE" run --rm --remove-orphans -T code-quality \
+        bash -lc 'mvn -f /workspace/pom.xml -DskipTests -Dcheckstyle.skip=false -Dpmd.skip=false clean verify'
+then
+  printf "\n"
+  warn "정적분석 실패 요약 (PMD)"
+  if [ -x "./scripts/pmd-summary.sh" ]; then
+    PMD_SUMMARY_LIMIT=120 ./scripts/pmd-summary.sh || true
+  else
+    warn "pmd-summary.sh가 없어 요약을 생략합니다."
   fi
-else
-  warn "pom.xml을 찾지 못해 Java 정적분석을 건너뜁니다."
+  warn "📄 상세 리포트: backend/target/site/pmd.html, backend/target/pmd.xml"
+  fail "Java 정적분석 실패 → 커밋 차단"
 fi
 
 divider

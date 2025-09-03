@@ -206,6 +206,14 @@
                     <failsOnError>true</failsOnError>
                     <violationSeverity>error</violationSeverity>
                 </configuration>
+                <!-- 🔒 Checkstyle 엔진 버전 고정 (도커 이미지/캐시로 9.x가 쓰이는 문제 방지) -->
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>10.12.7</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <id>checkstyle-verify</id>
@@ -262,6 +270,45 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- ✅ 포맷 자동수정(Spotless) -->
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.43.0</version> <!-- 최신 버전 확인 권장 -->
+                <configuration>
+                    <java>
+                        <!-- Google Java Format 규칙 적용 -->
+                        <googleJavaFormat>
+                            <version>1.17.0</version> <!-- Google Style 버전 -->
+                            <style>GOOGLE</style>
+                        </googleJavaFormat>
+
+                        <!-- import 순서 정리 -->
+                        <importOrder>
+                            <order>java,javax,org,com,com.hmm</order> <!-- 프로젝트 패키지를 마지막에 둡니다 -->
+                        </importOrder>
+
+                        <!-- 사용하지 않는 import 제거 -->
+                        <removeUnusedImports/>
+
+                        <!-- Javadoc 등의 특정 패턴에서 포맷팅 제외 -->
+                        <licenseHeader>
+                            <content>/* (C)$YEAR */</content>  <!-- 예시: 저작권 헤더는 건드리지 않음 -->
+                        </licenseHeader>
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>spotless-apply</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 </project>

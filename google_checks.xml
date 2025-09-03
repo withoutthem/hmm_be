@@ -1,0 +1,168 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--================================================================================-->
+<!--  HMM 백엔드 표준 Checkstyle (Checkstyle 10.x+)-->
+<!--================================================================================-->
+
+<module name="Checker">
+    <!-- =============================================================== -->
+    <!-- 전역 설정 (Checker)                                             -->
+    <!-- =============================================================== -->
+    <property name="charset" value="UTF-8"/>
+    <!-- (중요) 기본 심각도를 'warning'으로 설정하여, 사소한 스타일 위반으로 커밋이 막히는 것을 방지합니다. -->
+    <property name="severity" value="warning"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- =============================================================== -->
+    <!-- 파일 필터 및 예외 처리                                            -->
+    <!-- =============================================================== -->
+
+    <!-- module-info.java 파일은 검사에서 제외합니다. -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <!-- @SuppressWarnings 애너테이션을 사용한 경고 억제를 허용합니다. -->
+    <module name="SuppressWarningsFilter"/>
+
+    <!-- =============================================================== -->
+    <!-- 파일 레벨 검사 (헤더, 줄바꿈 등)                                  -->
+    <!-- =============================================================== -->
+
+    <!-- 파일 끝에 개행(뉴라인)이 있는지 검사합니다. (Unix 스타일 LF 강제) -->
+    <module name="NewlineAtEndOfFile">
+        <property name="lineSeparator" value="lf"/>
+    </module>
+
+    <!-- 탭(\t) 문자 사용을 금지하고 스페이스 사용을 권장합니다. -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="true"/>
+    </module>
+
+    <!-- 한 줄의 최대 길이를 제한합니다. (Google 기본값: 100자) -->
+    <module name="LineLength">
+        <property name="max" value="100"/>
+        <property name="ignorePattern"
+                  value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
+    <!--
+      ===============================================================
+      TreeWalker: 자바 소스의 구문 트리를 순회하며 세부 규칙을 검사합니다.
+      ===============================================================
+    -->
+    <module name="TreeWalker">
+
+        <!-- ================= Javadoc 주석 관련 규칙 ================= -->
+        <module name="InvalidJavadocPosition"/>
+        <module name="JavadocMethod">
+            <property name="accessModifiers" value="public"/>
+            <property name="allowMissingParamTags" value="true"/>
+            <property name="allowMissingReturnTag" value="true"/>
+            <property name="validateThrows" value="false"/>
+        </module>
+        <module name="JavadocStyle"/>
+        <module name="MissingJavadocType">
+            <property name="severity" value="warning"/>
+        </module>
+
+        <!-- ================= 명명 규칙 (Naming Conventions) ================= -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+        <module name="AbbreviationAsWordInName">
+            <property name="ignoreFinal" value="false"/>
+            <property name="allowedAbbreviationLength" value="2"/> <!-- (완화) DTO, ID 등 2~3글자 약어는 흔하므로 1 -> 2로 완화합니다. -->
+            <property name="severity" value="warning"/>
+        </module>
+
+        <!-- ================= 임포트 관련 규칙 (Imports) ================= -->
+        <module name="RedundantImport"/>
+        <module name="UnusedImports"/>
+        <module name="IllegalImport"/>
+        <!-- (중요) 와일드카드 import는 잠재적 충돌을 야기하므로 'error'로 커밋을 차단합니다. -->
+        <module name="AvoidStarImport">
+            <property name="severity" value="error"/>
+        </module>
+        <!-- (참고) ImportOrder는 Spotless가 자동으로 처리하므로, Checkstyle에서는 검사만 수행합니다. -->
+        <module name="ImportOrder">
+            <property name="groups" value="java,javax,org,com"/>
+            <property name="ordered" value="true"/>
+            <property name="separated" value="false"/> <!-- Spotless와의 충돌을 피하기 위해 그룹 간 빈 줄 강제는 끕니다. -->
+            <property name="sortStaticImportsAlphabetically" value="true"/>
+        </module>
+
+        <!-- ================= 공백/괄호/중괄호 스타일 ================= -->
+        <module name="EmptyLineSeparator">
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+        </module>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround"/>
+        <module name="LeftCurly"/>
+        <module name="RightCurly"/>
+        <module name="NeedBraces"/>
+        <module name="ArrayTypeStyle"/>
+
+        <!-- ================= (중요) 잠재적 버그 유발 규칙 (error로 설정) ================= -->
+        <module name="CovariantEquals">
+            <property name="severity" value="error"/>
+        </module>
+        <module name="EmptyStatement">
+            <property name="severity" value="error"/>
+        </module>
+        <module name="EqualsHashCode">
+            <property name="severity" value="error"/>
+        </module>
+        <module name="IllegalInstantiation">
+            <property name="severity" value="error"/>
+        </module>
+        <!-- (중요) 문자열 비교에 == 사용은 버그의 원인이므로 'error'로 커밋을 차단합니다. -->
+        <module name="StringLiteralEquality">
+            <property name="severity" value="error"/>
+        </module>
+        <module name="NoFinalizer">
+            <property name="severity" value="error"/>
+        </module>
+
+        <!-- ================= 기타 코드 품질 규칙 (warning으로 설정) ================= -->
+        <module name="DefaultComesLast"/>
+        <module name="FinalClass"/>
+        <module name="ModifiedControlVariable"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="UnnecessaryParentheses"/>
+
+        <!--
+          들여쓰기 규칙입니다. Google 기본은 2칸입니다.
+          팀 컨벤션에 따라 basicOffset을 4로 조정하는 경우가 많습니다.
+          (Spotless가 자동으로 처리하므로 여기서는 검증 역할만 합니다)
+        -->
+        <module name="Indentation">
+            <property name="basicOffset" value="2"/>
+            <property name="braceAdjustment" value="0"/>
+            <property name="caseIndent" value="2"/>
+            <property name="throwsIndent" value="4"/>
+            <property name="lineWrappingIndentation" value="4"/>
+            <property name="arrayInitIndent" value="2"/>
+        </module>
+
+        <!-- @SuppressWarnings("checkstyle:...") 처리를 위한 홀더 모듈 -->
+        <module name="SuppressWarningsHolder"/>
+
+    </module>
+</module>
+
