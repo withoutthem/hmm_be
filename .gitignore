@@ -1,34 +1,126 @@
-HELP.md
-target/
+# =================================================================
+#  Build Tools (Maven / Gradle)
+# =================================================================
+# Maven Wrapper
 .mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# Maven build output
+target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Gradle build output
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
-### IntelliJ IDEA ###
-.idea
+# Gradle Wrapper
+.gradle/
+gradle-app.setting
+gradlew
+gradlew.bat
+
+# =================================================================
+#  Dependencies & Package Managers
+# =================================================================
+# Node.js (프론트엔드 포함 시)
+node_modules/
+.pnpm-store/
+
+# =================================================================
+#  IDE & Editor Directories
+# =================================================================
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# STS / Eclipse
+.classpath
+.project
+.settings/
+.springBeans
+.apt_generated/
+.factorypath
+.sts4-cache/
+
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-!**/src/main/**/static/
 
-### VS Code ###
+# VS Code
 .vscode/
+
+# =================================================================
+#  Local Environment & Config Files
+# =================================================================
+# 환경변수 파일 (민감정보 주의)
+.env
+.env.*.local
+.env.development
+.env.production
+.env.dev
+.env.prod
+
+# 단, 로컬 개발용 .env.local 은 허용
+!.env.local
+
+# =================================================================
+#  Operating System Files
+# =================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =================================================================
+#  Logs & Reports
+# =================================================================
+# 일반 로그 및 리포트
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test coverage / reports
+coverage/
+.nyc_output/
+test-output/
+surefire-reports/
+jacoco-report/
+
+# =================================================================
+#  Tooling Cache & Temporary Files
+# =================================================================
+# Java / Kotlin
+*.class
+*.war
+*.ear
+
+# Annotation Processors
+out/
+.apt_generated/
+
+# ESLint / Prettier 캐시
+.eslintcache
+.prettiercache
+
+# Vite / Jest / Vitest 캐시
+.vite/
+.jest-cache/
+
+# Build tool caches
+.cache/
+.tmp/
