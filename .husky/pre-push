@@ -13,6 +13,7 @@ log()   { printf "${CYN}%s${NC}\n" "$*"; }
 ok()    { printf "✅ ${GRN}%s${NC}\n" "$*"; }
 warn()  { printf "⚠️  ${YLW}%s${NC}\n" "$*"; }
 fail()  { printf "❌ ${RED}%s${NC}\n" "$*" >&2; exit 1; }
+# shellcheck disable=SC2059
 divider(){ printf "\n${MAG}──────────────────────────────────────────────${NC}\n\n"; }
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
