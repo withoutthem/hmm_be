@@ -11,5 +11,5 @@ import lombok.Setter;
 @Setter
 public class StompFrame {
   private String destination; // 예: "/app/livechat/send", "/app/llm/ask"
-  private JsonNode body; // 실제 내용 (JSON)
+  private JsonNode body; // 실제 내용 (JSON) test
 }
