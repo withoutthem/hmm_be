@@ -146,20 +146,6 @@
         <module name="SimplifyBooleanReturn"/>
         <module name="UnnecessaryParentheses"/>
 
-        <!--
-          들여쓰기 규칙입니다. Google 기본은 2칸입니다.
-          팀 컨벤션에 따라 basicOffset을 4로 조정하는 경우가 많습니다.
-          (Spotless가 자동으로 처리하므로 여기서는 검증 역할만 합니다)
-        -->
-        <module name="Indentation">
-            <property name="basicOffset" value="2"/>
-            <property name="braceAdjustment" value="0"/>
-            <property name="caseIndent" value="2"/>
-            <property name="throwsIndent" value="4"/>
-            <property name="lineWrappingIndentation" value="4"/>
-            <property name="arrayInitIndent" value="2"/>
-        </module>
-
         <!-- @SuppressWarnings("checkstyle:...") 처리를 위한 홀더 모듈 -->
         <module name="SuppressWarningsHolder"/>
 
