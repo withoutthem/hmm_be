@@ -1,0 +1,28 @@
+# =================================================
+# DEVELOPMENT PROFILE OVERRIDES
+# =================================================
+server:
+  port: 18080
+
+spring:
+  r2dbc:
+    url: ${DEV_DB_URL}
+    username: ${DEV_DB_USERNAME}
+    password: ${DEV_DB_PASSWORD}
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 20
+logging:
+  file:
+    path: /Log/app/cbuip
+    name: hmm-cbuip
+  level:
+    com.hmm.backend: DEBUG
+# --- API Docs ---
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html

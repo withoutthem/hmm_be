@@ -1,0 +1,66 @@
+# =====================================================================
+# Husky pre-commit hook (BE 전용 레포)
+# - BE: Docker(Compose) 컨테이너에서 Maven 정적분석(Checkstyle/PMD)
+# - compose 파일은 infra/docker-compose.yml 우선 사용
+# =====================================================================
+
+set -euo pipefail
+
+# --------------------------- Helpers ---------------------------------
+log()   { printf "\033[36m%s\033[0m\n" "$*"; }
+ok()    { printf "✅ \033[32m%s\033[0m\n" "$*"; }
+warn()  { printf "⚠️  \033[33m%s\033[0m\n" "$*"; }
+fail()  { printf "❌ \033[31m%s\033[0m\n" "$*" >&2; exit 1; }
+error() { printf "❌ \033[31m%s\033[0m\n" "$*" >&2; }
+divider(){ printf "\n\033[35m──────────────────────────────────────────────\033[0m\n\n"; }
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+divider
+log "🚀 Husky pre-commit Hook 시작"
+
+# --------------- BE Static Analysis (Docker) -------------------------
+divider
+log "🛠 [Step 1] Java 정적분석 (Maven in Docker: Checkstyle/PMD)"
+
+command -v docker >/dev/null 2>&1 || fail "Docker가 필요합니다."
+docker compose version >/dev/null 2>&1 || fail "Docker Compose가 필요합니다."
+
+# compose 파일 탐색
+if   [ -f "infra/docker-compose.yml" ]; then
+  COMPOSE_FILE="infra/docker-compose.yml"
+elif [ -f "infra/docker-compose.yaml" ]; then
+  COMPOSE_FILE="infra/docker-compose.yaml"
+elif [ -f "docker-compose.yml" ]; then
+  COMPOSE_FILE="docker-compose.yml"
+elif [ -f "docker-compose.yaml" ]; then
+  COMPOSE_FILE="docker-compose.yaml"
+elif [ -f "compose.yaml" ]; then
+  COMPOSE_FILE="compose.yaml"
+else
+  fail "compose 파일을 찾을 수 없습니다."
+fi
+
+docker compose -f "$COMPOSE_FILE" config >/dev/null || fail "compose 구성 오류"
+
+# 루트가 바로 Maven 프로젝트(pom.xml)라고 가정
+if [ -f "pom.xml" ]; then
+  if ! docker compose -f "$COMPOSE_FILE" run --rm --remove-orphans -T code-quality \
+        bash -lc 'mvn -q -DskipTests \
+          -Dcheckstyle.skip=false -Dpmd.skip=false \
+          clean verify'
+  then
+    error "Java 정적분석 실패 → 커밋 차단"
+    echo "─── PMD 요약 ───"
+    PMD_SUMMARY_LIMIT=100 ./scripts/pmd-summary.sh || true
+    echo "📄 상세: target/site/pmd.html  또는  target/pmd.xml"
+    exit 1
+  fi
+else
+  warn "pom.xml을 찾지 못해 Java 정적분석을 건너뜁니다."
+fi
+
+divider
+ok "🎉🎉🎉 [pre-commit] 모든 검사 통과 🎉🎉🎉"
+divider

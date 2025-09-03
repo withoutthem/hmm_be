@@ -1,0 +1,59 @@
+services:
+  # =========================================================
+  # ORACLE DATABASE (23c Free) - 로컬 개발용
+  # =========================================================
+  oracle:
+    image: gvenzl/oracle-free:latest
+    container_name: oracle-23c-free
+    ports:
+      - "1527:1521"
+      - "5500:5500"
+    environment:
+      ORACLE_PASSWORD: "hmm1234**"
+      ORACLE_CHARACTERSET: "AL32UTF8"
+      TZ: "Asia/Seoul"
+    volumes:
+      - oracle23-data:/opt/oracle/oradata
+      - ./db/init:/container-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'select 1 from dual;' | sqlplus -s system/$${ORACLE_PASSWORD}@//127.0.0.1:1521/FREEPDB1 | grep -q '1'"]
+      interval: 15s
+      timeout: 5s
+      retries: 40
+
+  # =========================================================
+  # CODE QUALITY RUNNER (Maven 3.9 + Temurin JDK 17)
+  # =========================================================
+  code-quality:
+    image: maven:3.9.8-eclipse-temurin-17
+    working_dir: /workspace
+    volumes:
+      - ../:/workspace
+      - maven-repo:/root/.m2
+
+  # =========================================================
+  # REDIS (로컬 개발용)
+  # =========================================================
+  redis:
+    image: redis:7-alpine
+    container_name: redis-local
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "hmm1234**"]
+    environment:
+      TZ: "Asia/Seoul"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "hmm1234**", "PING"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+
+# ===========================================================
+# NAMED VOLUMES
+# ===========================================================
+volumes:
+  oracle23-data:
+  maven-repo:
+  redis-data:

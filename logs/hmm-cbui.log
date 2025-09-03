@@ -1,0 +1,7 @@
+2025-08-29 09:12:14.247 INFO  [background-preinit] [o.h.validator.internal.util.Version] - HV000001: Hibernate Validator 8.0.3.Final
+2025-08-29 09:12:14.256 INFO  [main] [c.hmm.cbui.BackendApplicationTests] - Starting BackendApplicationTests using Java 17.0.16 with PID 64863 (started by victorlee in /Users/victorlee/Desktop/cebu/backend)
+2025-08-29 09:12:14.257 INFO  [main] [c.hmm.cbui.BackendApplicationTests] - The following 1 profile is active: "local"
+2025-08-29 09:12:14.530 INFO  [main] [o.s.d.r.c.RepositoryConfigurationDelegate] - Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
+2025-08-29 09:12:14.538 INFO  [main] [o.s.d.r.c.RepositoryConfigurationDelegate] - Finished Spring Data repository scanning in 5 ms. Found 0 R2DBC repository interfaces.
+2025-08-29 09:12:14.870 INFO  [main] [o.s.b.a.w.s.WelcomePageHandlerMapping] - Adding welcome page: class path resource [static/index.html]
+2025-08-29 09:12:15.148 INFO  [main] [c.hmm.cbui.BackendApplicationTests] - Started BackendApplicationTests in 1.046 seconds (process running for 1.387)

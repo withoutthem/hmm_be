@@ -1,0 +1,4 @@
+@baseUrl = http://localhost:18080
+
+### TEST Connection
+GET {{baseUrl}}/api/test/rest

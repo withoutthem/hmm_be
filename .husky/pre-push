@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# =====================================================================
+# Husky pre-push hook (BE 전용 레포)
+# - BE: -P dev 강제, JDK 17을 리포/로컬에서 찾아 임시 JAVA_HOME 설정
+# =====================================================================
+
+. "$(dirname "$0")/husky.sh"
+set -euo pipefail
+
+# --------------------------- Helpers ---------------------------------
+CYN='\033[36m'; GRN='\033[32m'; YLW='\033[33m'; RED='\033[31m'; MAG='\033[35m'; NC='\033[0m'
+log()   { printf "${CYN}%s${NC}\n" "$*"; }
+ok()    { printf "✅ ${GRN}%s${NC}\n" "$*"; }
+warn()  { printf "⚠️  ${YLW}%s${NC}\n" "$*"; }
+fail()  { printf "❌ ${RED}%s${NC}\n" "$*" >&2; exit 1; }
+divider(){ printf "\n${MAG}──────────────────────────────────────────────${NC}\n\n"; }
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+cd "$REPO_ROOT"
+
+divider
+log "🚀 pre-push 시작: Backend 개발 빌드 검증"
+
+# ------------------------ BE: dev + 내부 JDK17 ------------------------
+divider
+log "🏗 [Step 1] Backend 개발 빌드 (-P dev, 내부 JDK 17 우선)"
+
+[ -f "pom.xml" ] || fail "pom.xml 이 없습니다."
+
+# 1) mvnw 선택 (루트 mvnw > 시스템 mvn)
+if [ -f "./mvnw" ]; then
+  MVN="sh ./mvnw"
+elif command -v mvn >/dev/null 2>&1; then
+  MVN="mvn"
+else
+  fail "Maven 실행기를 찾지 못했습니다. (./mvnw 또는 mvn 필요)"
+fi
+
+# 2) JDK17 탐색
+detect_jdk17() {
+  for CAND in "./.mvn/jdk-17" "./.jdk17"; do
+    [ -x "$CAND/bin/java" ] && echo "$CAND" && return 0
+  done
+  if command -v /usr/libexec/java_home >/dev/null 2>&1; then
+    JH="$(/usr/libexec/java_home -v 17 2>/dev/null || true)"
+    [ -n "${JH:-}" ] && [ -x "$JH/bin/java" ] && echo "$JH" && return 0
+  fi
+  for CAND in "/usr/lib/jvm/temurin-17"* "/usr/lib/jvm/java-17-"* "/opt/jdk-17"*; do
+    [ -x "$CAND/bin/java" ] && echo "$CAND" && return 0
+  done
+  return 1
+}
+
+JAVA_17_HOME=""
+if JAVA_17_HOME="$(detect_jdk17)"; then
+  log "🔧 JDK17 사용: $JAVA_17_HOME"
+  export JAVA_HOME="$JAVA_17_HOME"
+  export PATH="$JAVA_HOME/bin:$PATH"
+else
+  warn "JDK 17을 찾지 못했습니다. 현재 Java로 빌드(오류 가능) → 리포 내부에 JDK17을 두면 자동 사용됩니다."
+fi
+
+# 3) 빌드 실행
+BE_CMD="$MVN -q clean package -DskipTests -P dev"
+log "🏗 실행: ${BE_CMD}"
+sh -c "${BE_CMD}" || fail "Backend 개발 빌드 실패 → push 중단"
+
+ok "Backend 개발 빌드 통과"
+divider
+ok "🎉🎉🎉 [pre-push] BE 모든 빌드 통과(dev) 🎉🎉🎉 → push 진행"
