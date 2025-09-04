@@ -66,6 +66,7 @@
 <!--        <module name="JavadocStyle"/>-->
         <module name="MissingJavadocType">
             <property name="severity" value="warning"/>
+            <property name="skipAnnotations" value="SpringBootApplication,Configuration"/>
         </module>
 
         <!-- ================= 명명 규칙 (Naming Conventions) ================= -->

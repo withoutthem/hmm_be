@@ -1,5 +1,5 @@
 /* (C) 2025 HMM Corp. All rights reserved. */
-package com.hmm.cbui.config;
+package com.hmm.cbui.core.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

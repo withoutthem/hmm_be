@@ -1,5 +1,5 @@
 /* (C) 2025 HMM Corp. All rights reserved. */
-package com.hmm.cbui.config;
+package com.hmm.cbui.core.config;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.path;
