@@ -25,6 +25,14 @@ spring:
       initial-size: 20
       max-size: 100
       validation-query: SELECT 1 FROM DUAL
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      session:
+        store-type: redis
+        timeout: 3600s
+        # 세션 유효 시간 (1시간)
 logging:
   level:
     root: WARN

@@ -19,6 +19,10 @@ logging:
     name: hmm-cbuip
   level:
     com.hmm.backend: DEBUG
+
+daptalk:
+  url: http://ddaplfm.hmm21.com
+
 # --- API Docs ---
 springdoc:
   api-docs:

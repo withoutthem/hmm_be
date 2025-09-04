@@ -28,6 +28,9 @@ logging:
     org.springframework.data.r2dbc: DEBUG
     io.r2dbc.spi.ConnectionFactory: DEBUG
 
+daptalk:
+  url: http://localhost:8091
+
 # --- API Docs (Local Override) ---
 # 로컬 개발 시 API 문서 확인을 위해 활성화
 springdoc:
