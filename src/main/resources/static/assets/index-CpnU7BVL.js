@@ -597,7 +597,7 @@ def fib(n):
 `,W5=`
 # 제목 H1: 컴포넌트 종합 테스트
 
-## H2: 소개 및 기본 텍스트
+## H2: 소개 및 기본 텍스트d
 
 이 문서는 \`MDHTMLAnimator\` 컴포넌트의 렌더링 능력을 시험하기 위한 종합 테스트 데이터입니다. **굵은 텍스트**, *기울임꼴*, ~~취소선~~, 그리고 \`인라인 코드\`가 포함된 문단을 자연스럽게 표시해야 합니다. 이모지(😄👍)와 특수 문자( ©®™ ) 처리도 중요합니다.
 
@@ -629,7 +629,7 @@ def fib(n):
     2.  설계 및 API 디자인
         1.  Props 정의
         2.  상태 관리 전략
-2.  두 번째 할 일
+2.  두 번째 할 일1
 3.  세 번째 할 일
 
 ### H3: 할 일 목록 (Task List)
@@ -760,4 +760,4 @@ ___
 <div class="content-wrapper">
     <strong>중요 공지:</strong><span>&nbsp;이 부분은 중요합니다.</span>
 </div>
-`,r4=He(Ta)({display:"flex",alignItems:"center"});He(Ta)({display:"flex"});const Th=[Q5,K5,X5,F5,Z5,I5,W5,J5,t4,e4,n4,i4],a4=()=>{const[t,n]=L.useState(0);return nt.jsxs(Ta,{children:[nt.jsx(r4,{children:Th.map((r,s)=>nt.jsx(fM,{onClick:()=>n(s),sx:{fontWeight:t===s?"bold":"normal"},children:`테스트데이터${s+1}`},s+"asdf"))}),t>=0&&t<Th.length&&nt.jsx(s4,{children:nt.jsx(Y5,{markdown:Th[t],segment:"char",speed:20,delayMs:100,showCaret:!0,className:"md_html_animator",style:{border:"1px solid #ccc",padding:"1rem",borderRadius:8}})})]})},s4=He(Ta)({"& .prose":{fontSize:"16px",lineHeight:"1.5",color:"#333"}});function o4(){return nt.jsxs(d3,{children:[nt.jsx(gM,{}),nt.jsx(p3,{children:nt.jsx(a4,{})})]})}Vb.createRoot(document.getElementById("root")).render(nt.jsx(o4,{}));
+`,r4=He(Ta)({display:"flex",alignItems:"center"});He(Ta)({display:"flex"});const Th=[Q5,K5,X5,F5,Z5,I5,W5,J5,t4,e4,n4,i4],a4=()=>{const[t,n]=L.useState(0);return nt.jsxs(Ta,{sx:{maxWidth:"400px"},children:[nt.jsx(r4,{children:Th.map((r,s)=>nt.jsx(fM,{onClick:()=>n(s),sx:{fontWeight:t===s?"bold":"normal"},children:`테스트데이터${s+1}`},s+"asdf"))}),t>=0&&t<Th.length&&nt.jsx(s4,{children:nt.jsx(Y5,{markdown:Th[t],segment:"char",speed:20,delayMs:100,showCaret:!0,className:"md_html_animator"})})]})},s4=He(Ta)({"& .prose":{fontSize:"16px",lineHeight:"1.5",color:"#333"},"& .md_html_animator":{border:"1px solid #ccc",padding:"1rem",borderRadius:"8"}});function o4(){return nt.jsxs(d3,{children:[nt.jsx(gM,{}),nt.jsx(p3,{children:nt.jsx(a4,{})})]})}Vb.createRoot(document.getElementById("root")).render(nt.jsx(o4,{}));
