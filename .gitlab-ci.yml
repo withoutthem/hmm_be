@@ -2,4 +2,3 @@
 include:
   - local: 'ci/dev.gitlab-ci.yml'
   # prod는 추후 추가 예정
-  # - local: 'ci/prod.gitlab-ci.yml'

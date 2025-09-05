@@ -1,14 +1,10 @@
 # =============================================================================
 # 목적 (DEV 전용)
 #  - FE(React/TS/Vite) → BE(Spring Boot/WebFlux) 순으로 빌드
-#  - Vite 산출물(dist)은 vite.config.ts의 outDir 설정에 따라
-#    backend/src/main/resources/static 으로 바로 생성
+#  - Vite는 .env.dev 만 사용 (CI VITE_* 주입 없음)
+#  - Vite outDir 설정에 따라 backend/src/main/resources/static 으로 FE 산출물 생성
 #  - 최종 산출물(app.jar)을 /app/cbuip/was/ 로 배치
 #  - 실행 시 SPRING_PROFILES_ACTIVE=dev 로 application-dev.yml 적용
-#
-# 운영 분리
-#  - dev는 이 파일( ci/dev.gitlab-ci.yml )
-#  - prod는 별도 정의
 # =============================================================================
 
 stages:
@@ -16,7 +12,6 @@ stages:
   - be_build
   - assemble
 
-# 개발 브랜치를 한 곳으로 고정(필요 시 변경)
 variables:
   DEV_BRANCH: "develop"
 
@@ -27,27 +22,6 @@ variables:
   BE_JAR_GLOB: "backend/target/*.jar"
   MVN_REPO_LOCAL: ".m2/repository"
 
-  # Vite 빌드타임 주입값(DEV). 실제로는 GitLab UI에서 override 권장
-  VITE_API_BASE_URL: "http://dcbuip.hmm21.com:18080/api"
-  VITE_API_TIMEOUT: "10000"
-  VITE_API_WITH_CREDENTIALS: "false"
-  VITE_WS_BASE_URL: "ws://dcbuip.hmm21.com:18080"
-  VITE_WS_PATH: "/ws"
-  VITE_WS_RETRY_MIN_MS: "500"
-  VITE_WS_RETRY_MAX_MS: "10000"
-  VITE_WS_HEARTBEAT_MS: "5000"
-  VITE_WS_REQUEST_TIMEOUT_MS: "10000"
-  VITE_RQ_STALE_TIME_MS: "30000"
-  VITE_RQ_CACHE_TIME_MS: "300000"
-  VITE_RQ_RETRY: "1"
-  VITE_RQ_REFETCH_ON_WINDOW_FOCUS: "false"
-
-  # Spring DEV DB 크리덴셜(필수: GitLab Variables에서 채움)
-  DEV_DB_URL: ""
-  DEV_DB_USERNAME: ""
-  DEV_DB_PASSWORD: ""
-
-# npm, Maven 캐시
 cache:
   key: "$CI_COMMIT_REF_SLUG"
   paths:
@@ -55,20 +29,19 @@ cache:
     - .m2/repository/
   policy: pull-push
 
-# 1) FE 빌드 (npm만 사용)
+# 1) FE 빌드 (npm only / .env.dev 사용)
 fe:build:
   stage: fe_build
   image: $NODE_IMAGE
   rules:
-    # develop 브랜치에서만 자동 실행
     - if: '$CI_COMMIT_BRANCH == $DEV_BRANCH'
       changes:
         - "frontend/**"
-        - "backend/**"       # vite outDir 대상 경로가 backend 쪽이므로 함께 감지
+        - "frontend/.env.dev"
+        - "backend/**"               # outDir 대상 경로 변경 감지
         - "ci/dev.gitlab-ci.yml"
         - ".gitlab-ci.yml"
       when: on_success
-    # MR에서 develop을 타겟으로 할 때는 수동 실행 가능
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == $DEV_BRANCH'
       when: manual
   before_script:
@@ -81,18 +54,19 @@ fe:build:
         npm install
       fi
   script:
-    # --mode prod 로 빌드해야 CI의 VITE_* 변수 주입이 보장됨
-    - npm run build:prod
-    # FE 산출물이 backend/static 으로 제대로 생성되었는지 검증
+    # Vite 모드 = dev → .env.dev 로딩
+    - npm run build:dev
+    # FE 산출물이 backend/static 으로 생성됐는지 검증
     - test -d "../backend/src/main/resources/static" || (echo "static 생성 실패"; exit 1)
     - test -f "../backend/src/main/resources/static/index.html" || (echo "index.html 누락"; exit 1)
   artifacts:
     name: "fe-static-$CI_COMMIT_SHORT_SHA"
+    when: on_success
+    expire_in: 2 days
     paths:
       - "backend/src/main/resources/static"
-    expire_in: 2 days
 
-# 2) BE 빌드
+# 2) BE 빌드 (FE 산출물 포함하여 JAR 패키징)
 be:build:
   stage: be_build
   image: $MAVEN_IMAGE
@@ -110,16 +84,16 @@ be:build:
     - java -version && mvn -v
     - cd backend
   script:
-    # 내부 .m2 캐시 사용, 테스트는 생략(필요 시 제거)
     - mvn -q -DskipTests -Dmaven.repo.local="../$MVN_REPO_LOCAL" clean package || (echo "Maven 빌드 실패"; exit 1)
     - ls -l target
   artifacts:
     name: "be-jar-$CI_COMMIT_SHORT_SHA"
+    when: on_success
+    expire_in: 7 days
     paths:
       - "$BE_JAR_GLOB"
-    expire_in: 7 days
 
-# 3) 산출물 정리(개발 번들)
+# 3) 산출물 정리(개발 번들 배치)
 assemble:dev:
   stage: assemble
   image: alpine:3.20
@@ -133,12 +107,11 @@ assemble:dev:
     - apk add --no-progress bash coreutils
     - mkdir -p "$WAS_OUT_DIR"
   script:
-    # 최신 JAR 배치
     - rm -f "$WAS_OUT_DIR/app.jar" || true
     - BE_JAR=$(ls $BE_JAR_GLOB | head -n 1)
     - cp "$BE_JAR" "$WAS_OUT_DIR/app.jar"
 
-    # 개발 실행용 환경 파일
+    # ← 여기! 블록 스칼라(|) 뒤 라인들은 반드시 들여쓰기 유지
     - |
       cat > "$WAS_OUT_DIR/backend.dev.env" <<'ENV'
       SPRING_PROFILES_ACTIVE=dev
@@ -146,10 +119,12 @@ assemble:dev:
       DEV_DB_USERNAME=${DEV_DB_USERNAME}
       DEV_DB_PASSWORD=${DEV_DB_PASSWORD}
       ENV
+
     - echo "JAR 위치: $WAS_OUT_DIR/app.jar"
     - echo "런타임 ENV: $WAS_OUT_DIR/backend.dev.env"
   artifacts:
     name: "was-dev-bundle-$CI_COMMIT_SHORT_SHA"
+    when: on_success
+    expire_in: 2 days
     paths:
       - "$WAS_OUT_DIR"
-    expire_in: 2 days
