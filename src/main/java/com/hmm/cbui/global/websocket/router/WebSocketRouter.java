@@ -26,10 +26,7 @@ public class WebSocketRouter implements WebSocketHandler {
   private final SessionOutRegistry outRegistry;
 
   public WebSocketRouter(
-      List<MessageHandler> handlers,
-      ObjectMapper objectMapper,
-      SessionOutRegistry outRegistry
-      ) {
+      List<MessageHandler> handlers, ObjectMapper objectMapper, SessionOutRegistry outRegistry) {
     this.handlers = handlers;
     this.objectMapper = objectMapper;
     this.outRegistry = outRegistry;

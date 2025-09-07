@@ -17,22 +17,22 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/test")
 public class TestController {
 
-    /** 단순 REST 확인용 */
-    @GetMapping("/rest")
-    public Mono<ResponseEntity<String>> rest() {
-        return Mono.just(ResponseEntity.ok("HTTP REST API is working!"));
-    }
+  /** 단순 REST 확인용 */
+  @GetMapping("/rest")
+  public Mono<ResponseEntity<String>> rest() {
+    return Mono.just(ResponseEntity.ok("HTTP REST API is working!"));
+  }
 
-    /** SSE 테스트용: 1초마다 tick 전송 */
-    @GetMapping(path = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<String>> sse() {
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(i ->
-                        ServerSentEvent.<String>builder()
-                                .id(Long.toString(i))
-                                .event("tick")
-                                .data("hello-" + i)
-                                .build()
-                );
-    }
+  /** SSE 테스트용: 1초마다 tick 전송 */
+  @GetMapping(path = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  public Flux<ServerSentEvent<String>> sse() {
+    return Flux.interval(Duration.ofSeconds(1))
+        .map(
+            i ->
+                ServerSentEvent.<String>builder()
+                    .id(Long.toString(i))
+                    .event("tick")
+                    .data("hello-" + i)
+                    .build());
+  }
 }
