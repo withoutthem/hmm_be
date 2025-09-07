@@ -23,12 +23,12 @@ public class WebSocketRouter implements WebSocketHandler {
 
   private final List<MessageHandler> handlers;
   private final ObjectMapper objectMapper;
-  private final SessionOutRegistry outRegistry; // ✅ 추가
+  private final SessionOutRegistry outRegistry;
 
   public WebSocketRouter(
       List<MessageHandler> handlers,
       ObjectMapper objectMapper,
-      SessionOutRegistry outRegistry // ✅ 추가
+      SessionOutRegistry outRegistry
       ) {
     this.handlers = handlers;
     this.objectMapper = objectMapper;
