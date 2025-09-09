@@ -21,7 +21,8 @@ logging:
     com.hmm.backend: DEBUG
 
 daptalk:
-  url: http://ddaplfm.hmm21.com
+  url: https://ddapplfm.hmm21.com
+  file-path: /data/documents/
 
 # --- API Docs ---
 springdoc:

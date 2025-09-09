@@ -4,6 +4,7 @@ package com.hmm.cbui.core.config;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,9 @@ import reactor.netty.resources.LoopResources;
 @Configuration
 public class WebClientConfig {
   private LoopResources loopResources;
+
+  @Value("${server.port}")
+  private String baseUrl;
 
   @Bean
   public WebClient webClient() {
@@ -94,7 +98,7 @@ public class WebClientConfig {
     // 기본 헤더설정
 
     return WebClient.builder()
-        .baseUrl("http://localhost:8090")
+        .baseUrl("localhost:" + baseUrl)
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .clientConnector(new ReactorClientHttpConnector(httpClient)) // 생성한 HttpClient 연결
         // Request Header 로깅 필터

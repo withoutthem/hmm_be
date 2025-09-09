@@ -33,6 +33,11 @@ spring:
         store-type: redis
         timeout: 3600s
         # 세션 유효 시간 (1시간)
+
+daptalk:
+  url: https://ddapplfm.hmm21.com
+  file-path: C:\hmm_workspace\data\documents # pc 다운로드 경로
+
 logging:
   level:
     root: WARN

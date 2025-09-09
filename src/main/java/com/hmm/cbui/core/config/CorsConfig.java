@@ -1,6 +1,8 @@
 /* (C) 2025 HMM Corp. All rights reserved. */
 package com.hmm.cbui.core.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -18,13 +20,15 @@ public class CorsConfig {
     cfg.addAllowedOriginPattern("http://localhost:5173");
 
     cfg.addAllowedHeader("*"); // 모든 헤더 허용
-    cfg.addAllowedMethod("*"); // GET, POST, PUT, DELETE, OPTIONS 등
+    cfg.setAllowedMethods(List.of("GET", "POST")); // GET, POST, PUT, DELETE, OPTIONS 등
+    cfg.setExposedHeaders(List.of("Content-Disposition")); // 응답에서 노출할 헤더
     cfg.setAllowCredentials(false); // 쿠키/인증정보 안 쓰면 false가 단순함
     cfg.setMaxAge(3600L); // preflight 캐시(초)
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     // API 경로 전체 허용
     source.registerCorsConfiguration("/api/**", cfg);
+    source.registerCorsConfiguration("/sse/**", cfg);
     // swagger도 보려면 필요시 추가:
     source.registerCorsConfiguration("/v3/api-docs/**", cfg);
     source.registerCorsConfiguration("/swagger-ui/**", cfg);
