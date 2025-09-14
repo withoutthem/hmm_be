@@ -23,7 +23,7 @@ public class TestController {
     return Mono.just(ResponseEntity.ok("HTTP REST API is working!"));
   }
 
-  /** SSE 테스트용: 1초마다 tick 전송 */
+  /** SSE 테스트용: 1초마다 tick 전송-test */
   @GetMapping(path = "/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<ServerSentEvent<String>> sse() {
     return Flux.interval(Duration.ofSeconds(1))
