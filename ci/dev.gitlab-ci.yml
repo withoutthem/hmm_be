@@ -15,6 +15,11 @@
 #•	    ref: "develop"
 #  2.	FE 파이프라인이 미리 성공해 있어야 하고, 그 결과 frontend/dist/ 아티팩트가 존재해야 함
 #  3.	**FE Settings → CI/CD → Job Token 권한(Allowlist)**에 BE 프로젝트를 추가해야 함(멀티레포 아티팩트 접근 허용)
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - when: never
 
 stages: [build, assemble]
 
