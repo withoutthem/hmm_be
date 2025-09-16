@@ -9,7 +9,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
-import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import com.hmm.cbui.core.annotation.WebSocketClient;
 
@@ -23,7 +22,6 @@ public class WebSocketMessageAspect {
 
   private static final int LIMIT = 2;
   // Reactor Netty WebSocketClient
-  private final StandardWebSocketClient client = new StandardWebSocketClient();
 
   @Around("@annotation(wsClient)")
   public Object handleWebSocketMessage(ProceedingJoinPoint pjp, WebSocketClient wsClient)

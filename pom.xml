@@ -120,21 +120,21 @@
         </dependency>
 
         <!-- WebSocket (순수 WebFlux만 쓰면 제거 가능) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-            <exclusions>
-                <exclusion><groupId>com.google.guava</groupId><artifactId>guava</artifactId></exclusion>
-                <exclusion><groupId>commons-fileupload</groupId><artifactId>commons-fileupload</artifactId></exclusion>
-                <exclusion><groupId>commons-io</groupId><artifactId>commons-io</artifactId></exclusion>
-                <exclusion><groupId>commons-lang</groupId><artifactId>commons-lang</artifactId></exclusion>
-            </exclusions>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-websocket</artifactId>-->
+<!--            <exclusions>-->
+<!--                <exclusion><groupId>com.google.guava</groupId><artifactId>guava</artifactId></exclusion>-->
+<!--                <exclusion><groupId>commons-fileupload</groupId><artifactId>commons-fileupload</artifactId></exclusion>-->
+<!--                <exclusion><groupId>commons-io</groupId><artifactId>commons-io</artifactId></exclusion>-->
+<!--                <exclusion><groupId>commons-lang</groupId><artifactId>commons-lang</artifactId></exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
 
         <!-- Redis 클라이언트 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
 
         <!-- Spring Session Redis -->
