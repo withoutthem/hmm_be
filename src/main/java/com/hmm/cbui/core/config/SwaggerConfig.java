@@ -12,7 +12,10 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI openAPI() {
     Info info =
-        new Info().title("HMM API").version("v1.0").description("Spring Boot API Documentation");
+        new Info()
+            .title("HMM ChatBot API")
+            .version("v1.0")
+            .description("HMM 생성형 챗봇UI에서 사용하는 모든 API모음 입니다.");
     return new OpenAPI().info(info);
   }
 }

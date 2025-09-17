@@ -21,6 +21,7 @@ import reactor.netty.http.client.HttpClient;
 public class WebSocketMessageAspect {
 
   private static final int LIMIT = 2;
+
   // Reactor Netty WebSocketClient
 
   @Around("@annotation(wsClient)")
