@@ -17,4 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/livechat")
-public class LiveChatController {}
+public class LiveChatController {
+ // 테스트
+}
