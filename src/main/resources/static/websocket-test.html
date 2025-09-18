@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket 테스트</title>
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-primary:hover { background-color: #0056b3; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-success:hover { background-color: #1e7e34; }
+        .btn-warning { background-color: #ffc107; color: black; }
+        .btn-warning:hover { background-color: #e0a800; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        .btn-danger:hover { background-color: #c82333; }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+        }
+        .test-section {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 HMM CBUI WebSocket 테스트</h1>
+
+    <div class="container">
+        <h2>연결 상태</h2>
+        <div id="status" class="status disconnected">연결 안됨</div>
+
+        <div class="controls">
+            <button id="connectBtn" class="btn-primary">연결</button>
+            <button id="disconnectBtn" class="btn-danger">연결 해제</button>
+            <button id="clearBtn" class="btn-warning">메시지 지우기</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>메시지 전송</h2>
+
+        <div class="input-group">
+            <label for="destination">Destination:</label>
+            <select id="destination">
+                <option value="/app/livechat/send">라이브채팅 전송</option>
+                <option value="/app/livechat/subscribe">라이브채팅 구독</option>
+                <option value="/test/bus/subscribe">테스트 버스 구독</option>
+                <option value="/test/bus/publish">테스트 버스 발행</option>
+                <option value="/test/bus/unsubscribe">테스트 버스 구독 해제</option>
+                <option value="/test/clock/start">테스트 클럭 시작</option>
+                <option value="/app/custom/test">커스텀 테스트</option>
+                <option value="/app/custom/echo">커스텀 에코</option>
+                <option value="/app/custom/broadcast">커스텀 브로드캐스트</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="messageBody">메시지 Body (JSON):</label>
+            <textarea id="messageBody" placeholder='{"roomId": "room1", "sender": "user1", "content": "안녕하세요!"}'></textarea>
+        </div>
+
+        <button id="sendBtn" class="btn-success">메시지 전송</button>
+    </div>
+
+    <div class="container">
+        <h2>메시지 로그</h2>
+        <div id="messages" class="messages"></div>
+    </div>
+
+    <div class="container test-section">
+        <h3>🧪 빠른 테스트</h3>
+        <div class="controls">
+            <button id="testLiveChat" class="btn-primary">라이브채팅 테스트</button>
+            <button id="testBus" class="btn-primary">버스 테스트</button>
+            <button id="testClock" class="btn-primary">클럭 테스트</button>
+            <button id="testCustom" class="btn-primary">커스텀 테스트</button>
+        </div>
+    </div>
+
+    <script>
+        class WebSocketTester {
+            constructor() {
+                this.socket = null;
+                this.isConnected = false;
+                this.messageCount = 0;
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.statusEl = document.getElementById('status');
+                this.connectBtn = document.getElementById('connectBtn');
+                this.disconnectBtn = document.getElementById('disconnectBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.destinationEl = document.getElementById('destination');
+                this.messageBodyEl = document.getElementById('messageBody');
+                this.messagesEl = document.getElementById('messages');
+
+                // 테스트 버튼들
+                this.testLiveChatBtn = document.getElementById('testLiveChat');
+                this.testBusBtn = document.getElementById('testBus');
+                this.testClockBtn = document.getElementById('testClock');
+                this.testCustomBtn = document.getElementById('testCustom');
+            }
+
+            bindEvents() {
+                this.connectBtn.addEventListener('click', () => this.connect());
+                this.disconnectBtn.addEventListener('click', () => this.disconnect());
+                this.clearBtn.addEventListener('click', () => this.clearMessages());
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+
+                // 테스트 버튼들
+                this.testLiveChatBtn.addEventListener('click', () => this.testLiveChat());
+                this.testBusBtn.addEventListener('click', () => this.testBus());
+                this.testClockBtn.addEventListener('click', () => this.testClock());
+                this.testCustomBtn.addEventListener('click', () => this.testCustom());
+
+                // Enter 키로 전송
+                this.messageBodyEl.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+            }
+
+            connect() {
+                if (this.isConnected) {
+                    this.addMessage('system', '이미 연결되어 있습니다.');
+                    return;
+                }
+
+                this.updateStatus('connecting', '연결 중...');
+
+                // WebSocket 연결 (현재 프로젝트의 라우터 사용)
+                this.socket = new WebSocket('ws://localhost:18080/ws');
+
+                this.socket.onopen = () => {
+                    this.isConnected = true;
+                    this.updateStatus('connected', '연결됨');
+                    this.addMessage('system', 'WebSocket 연결이 성공했습니다.');
+                };
+
+                this.socket.onmessage = (event) => {
+                    this.addMessage('received', `받은 메시지: ${event.data}`);
+                };
+
+                this.socket.onclose = () => {
+                    this.isConnected = false;
+                    this.updateStatus('disconnected', '연결 해제됨');
+                    this.addMessage('system', 'WebSocket 연결이 해제되었습니다.');
+                };
+
+                this.socket.onerror = (error) => {
+                    this.updateStatus('disconnected', '연결 오류');
+                    this.addMessage('system', `연결 오류: ${error}`);
+                };
+            }
+
+            disconnect() {
+                if (this.socket) {
+                    this.socket.close();
+                    this.socket = null;
+                }
+            }
+
+            sendMessage() {
+                if (!this.isConnected) {
+                    this.addMessage('system', '먼저 연결해주세요.');
+                    return;
+                }
+
+                const destination = this.destinationEl.value;
+                let body;
+
+                try {
+                    const bodyText = this.messageBodyEl.value.trim();
+                    if (bodyText) {
+                        body = JSON.parse(bodyText);
+                    } else {
+                        body = {};
+                    }
+                } catch (e) {
+                    this.addMessage('system', 'JSON 형식이 올바르지 않습니다.');
+                    return;
+                }
+
+                const message = {
+                    destination: destination,
+                    body: body
+                };
+
+                this.socket.send(JSON.stringify(message));
+                this.addMessage('sent', `전송: ${JSON.stringify(message, null, 2)}`);
+            }
+
+            testLiveChat() {
+                if (!this.isConnected) {
+                    this.addMessage('system', '먼저 연결해주세요.');
+                    return;
+                }
+
+                // 1. 구독
+                const subscribeMsg = {
+                    destination: '/app/livechat/subscribe',
+                    body: { roomId: 'test-room-1' }
+                };
+                this.socket.send(JSON.stringify(subscribeMsg));
+                this.addMessage('sent', `라이브채팅 구독: ${JSON.stringify(subscribeMsg)}`);
+
+                // 2. 메시지 전송
+                setTimeout(() => {
+                    const sendMsg = {
+                        destination: '/app/livechat/send',
+                        body: {
+                            roomId: 'test-room-1',
+                            sender: 'test-user',
+                            content: '안녕하세요! 라이브채팅 테스트입니다.',
+                            timestamp: new Date().toISOString()
+                        }
+                    };
+                    this.socket.send(JSON.stringify(sendMsg));
+                    this.addMessage('sent', `라이브채팅 전송: ${JSON.stringify(sendMsg)}`);
+                }, 1000);
+            }
+
+            testBus() {
+                if (!this.isConnected) {
+                    this.addMessage('system', '먼저 연결해주세요.');
+                    return;
+                }
+
+                // 1. 구독
+                const subscribeMsg = {
+                    destination: '/test/bus/subscribe',
+                    body: { topic: 'test-topic' }
+                };
+                this.socket.send(JSON.stringify(subscribeMsg));
+                this.addMessage('sent', `버스 구독: ${JSON.stringify(subscribeMsg)}`);
+
+                // 2. 메시지 발행
+                setTimeout(() => {
+                    const publishMsg = {
+                        destination: '/test/bus/publish',
+                        body: {
+                            topic: 'test-topic',
+                            data: { message: '버스 테스트 메시지입니다!', timestamp: new Date().toISOString() }
+                        }
+                    };
+                    this.socket.send(JSON.stringify(publishMsg));
+                    this.addMessage('sent', `버스 발행: ${JSON.stringify(publishMsg)}`);
+                }, 1000);
+            }
+
+            testClock() {
+                if (!this.isConnected) {
+                    this.addMessage('system', '먼저 연결해주세요.');
+                    return;
+                }
+
+                const clockMsg = {
+                    destination: '/test/clock/start',
+                    body: {}
+                };
+                this.socket.send(JSON.stringify(clockMsg));
+                this.addMessage('sent', `클럭 시작: ${JSON.stringify(clockMsg)}`);
+            }
+
+            testCustom() {
+                if (!this.isConnected) {
+                    this.addMessage('system', '먼저 연결해주세요.');
+                    return;
+                }
+
+                // 1. 커스텀 테스트
+                const testMsg = {
+                    destination: '/app/custom/test',
+                    body: { message: '커스텀 테스트 메시지입니다!', timestamp: new Date().toISOString() }
+                };
+                this.socket.send(JSON.stringify(testMsg));
+                this.addMessage('sent', `커스텀 테스트: ${JSON.stringify(testMsg)}`);
+
+                // 2. 에코 테스트
+                setTimeout(() => {
+                    const echoMsg = {
+                        destination: '/app/custom/echo',
+                        body: { echo: '에코 테스트 메시지입니다!', data: { test: true } }
+                    };
+                    this.socket.send(JSON.stringify(echoMsg));
+                    this.addMessage('sent', `에코 테스트: ${JSON.stringify(echoMsg)}`);
+                }, 1000);
+
+                // 3. 브로드캐스트 테스트
+                setTimeout(() => {
+                    const broadcastMsg = {
+                        destination: '/app/custom/broadcast',
+                        body: { broadcast: '브로드캐스트 테스트 메시지입니다!', priority: 'high' }
+                    };
+                    this.socket.send(JSON.stringify(broadcastMsg));
+                    this.addMessage('sent', `브로드캐스트 테스트: ${JSON.stringify(broadcastMsg)}`);
+                }, 2000);
+            }
+
+            updateStatus(type, message) {
+                this.statusEl.className = `status ${type}`;
+                this.statusEl.textContent = message;
+            }
+
+            addMessage(type, content) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${type}`;
+
+                const timestamp = new Date().toLocaleTimeString();
+                messageEl.innerHTML = `
+                    <div class="timestamp">[${timestamp}]</div>
+                    <div>${content}</div>
+                `;
+
+                this.messagesEl.appendChild(messageEl);
+                this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+            }
+
+            clearMessages() {
+                this.messagesEl.innerHTML = '';
+            }
+        }
+
+        // 페이지 로드 시 테스터 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            new WebSocketTester();
+        });
+    </script>
+</body>
+</html>

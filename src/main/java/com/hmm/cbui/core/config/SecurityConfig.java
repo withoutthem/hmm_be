@@ -20,7 +20,12 @@ public class SecurityConfig {
     return http.authorizeExchange(
             exchange ->
                 exchange
-                    .pathMatchers("/public/**", "/ws/**") // ws 인증 없이 접근 가능( JHM 개발용 )
+                    .pathMatchers("/public/**",
+                                  "/ws/**",
+                                  "livechat-api-test.html",// livechat API 테스트페이지 인증 없이 접근 가능 (JHM 개발용)
+                                  "websocket-test.html",// websocket 테스트페이지 인증 없이 접근 가능 (JHM 개발용)
+                                  "/api/livechat/**" // 라이브챗 API 인증 없이 접근 가능 (JHM 개발용)
+                    ) // ws 인증 없이 접근 가능( JHM 개발용 )
                     .permitAll() // /public 경로는 인증 없이 접근 가능
                     .anyExchange()
                     .authenticated() // 그 외 모든 요청은 인증 필요
