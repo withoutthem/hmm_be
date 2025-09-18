@@ -18,5 +18,5 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api/livechat")
 public class LiveChatController {
- // 테스트
+  // 테스트
 }
