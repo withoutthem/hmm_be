@@ -1,20 +1,23 @@
 /* (C) 2025 HMM Corp. All rights reserved. */
 package com.hmm.cbui.core.config;
 
+import java.util.Map;
+
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.reactive.socket.WebSocketHandler;
-import org.springframework.web.reactive.socket.WebSocketMessage;
-import org.springframework.web.reactive.socket.WebSocketSession;
+import org.springframework.web.reactive.handler.SimpleUrlHandlerMapping;
+import org.springframework.web.reactive.socket.server.support.WebSocketHandlerAdapter;
+
+import com.hmm.cbui.global.websocket.router.WebSocketRouter;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Configuration
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketHandler {
+// public class WebSocketConfig implements WebSocketHandler {
+public class WebSocketConfig {
 
-  //  private final WebSocketRouter webSocketRouter; // 👈 주입 대상 변경
+  private final WebSocketRouter webSocketRouter; // 👈 주입 대상 변경
 
   //  @Override
   //  public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -44,15 +47,28 @@ public class WebSocketConfig implements WebSocketHandler {
   //  public WebSocketHandlerAdapter handlerAdapter() {
   //    return new WebSocketHandlerAdapter();
   //  }
-  @Override
-  public Mono<Void> handle(WebSocketSession session) {
-    Flux<WebSocketMessage> output =
-        session
-            .receive()
-            .map(WebSocketMessage::getPayloadAsText)
-            .map(msg -> "Echo: " + msg)
-            .map(session::textMessage);
 
-    return session.send(output);
+  //  @Override
+  //  public Mono<Void> handle(WebSocketSession session) {
+  //    Flux<WebSocketMessage> output =
+  //        session
+  //            .receive()
+  //            .map(WebSocketMessage::getPayloadAsText)
+  //            .map(msg -> "Echo: " + msg)
+  //            .map(session::textMessage);
+  //
+  //    return session.send(output);
+  //  }
+
+  @Bean
+  public SimpleUrlHandlerMapping webSocketHandlerMapping() {
+    // 모든 Websocket 요청은 WebsocketRouter가 담당
+    Map<String, Object> map = Map.of("/ws/**", webSocketRouter);
+    return new SimpleUrlHandlerMapping(map, -1);
+  }
+
+  @Bean
+  public WebSocketHandlerAdapter webSocketHandlerAdapter() {
+    return new WebSocketHandlerAdapter();
   }
 }
