@@ -1,4 +1,0 @@
-# 루트 파이프라인: 환경별 하위 파이프라인을 include
-include:
-  - local: 'ci/dev.gitlab-ci.yml'
-  # prod는 추후 추가 예정
