@@ -23,6 +23,7 @@ import lombok.ToString;
 public class ApiResponseDto<T> {
   @SuppressWarnings("PMD.AvoidFieldNameMatchingMethodName")
   private boolean success;
+
   private String message;
   private T data;
   private String errorCode;

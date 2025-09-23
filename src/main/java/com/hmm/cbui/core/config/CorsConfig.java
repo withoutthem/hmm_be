@@ -29,6 +29,7 @@ public class CorsConfig {
     // API 경로 전체 허용
     source.registerCorsConfiguration("/api/**", cfg);
     source.registerCorsConfiguration("/sse/**", cfg);
+    source.registerCorsConfiguration("/login/**", cfg);
     // swagger도 보려면 필요시 추가:
     source.registerCorsConfiguration("/v3/api-docs/**", cfg);
     source.registerCorsConfiguration("/swagger-ui/**", cfg);

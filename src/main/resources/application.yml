@@ -25,15 +25,18 @@ spring:
       initial-size: 20
       max-size: 100
       validation-query: SELECT 1 FROM DUAL
+  session:
+    store-type: redis
+    redis:
+      flush-mode: immediate
+      namespace: hmm_cbui:session
+    timeout: 3600s
+    # 세션 유효 시간 (1시간)
   data:
     redis:
-      host: localhost
+      host: 127.0.0.1
       port: 6379
       password: hmm1234**
-      session:
-        store-type: redis
-        timeout: 3600s
-        # 세션 유효 시간 (1시간)
 
 daptalk:
   url: https://ddapplfm.hmm21.com
