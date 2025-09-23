@@ -3,10 +3,13 @@ package com.hmm.cbui.domain.test.websocket;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketSession;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import com.hmm.cbui.global.websocket.dto.StompFrame;
 import com.hmm.cbui.global.websocket.handler.MessageHandler;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -32,15 +35,15 @@ public class CustomTestHandler implements MessageHandler {
 
     log.info("CustomTestHandler 처리 중: destination={}, sessionId={}", destination, sessionId);
 
-      return switch (destination) {
-          case "/app/custom/test" -> handleTest(session, frame);
-          case "/app/custom/echo" -> handleEcho(session, frame);
-          case "/app/custom/broadcast" -> handleBroadcast(session, frame);
-          default -> {
-              emitError(sessionId, "지원하지 않는 destination: " + destination);
-              yield Mono.empty();
-          }
-      };
+    return switch (destination) {
+      case "/app/custom/test" -> handleTest(session, frame);
+      case "/app/custom/echo" -> handleEcho(session, frame);
+      case "/app/custom/broadcast" -> handleBroadcast(session, frame);
+      default -> {
+        emitError(sessionId, "지원하지 않는 destination: " + destination);
+        yield Mono.empty();
+      }
+    };
   }
 
   private Mono<Void> handleTest(WebSocketSession session, StompFrame frame) {

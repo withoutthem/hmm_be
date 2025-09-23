@@ -4,77 +4,64 @@ package com.hmm.cbui.domain.dapTalk.service;
 import java.io.File;
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import com.hmm.cbui.domain.dapTalk.dto.DapTalkEngineReqDto;
+import com.hmm.cbui.domain.dapTalk.dto.DapTalkEvltMsgDto;
+import com.hmm.cbui.domain.dapTalk.dto.DapTalkReqParametersDto;
+import com.hmm.cbui.domain.dapTalk.dto.DapTalkUsrChtHistDto;
 import com.hmm.cbui.domain.dapTalk.dto.DapTalkWlcmReqDto;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
-// test용 파일 삭제 필요
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class DapTalkResService {
   private static final String RESULT = "result";
+  private static final String EXTERNAL_API_BASE_URL = "https://ddapplfm.hmm21.com/";
+
+  private final WebClient webClient;
+  @Autowired private ObjectMapper objectMapper;
 
   /** Welcome */
-  public String welcome(DapTalkWlcmReqDto dapTalkWlcmReqDto) {
-    return extractJson("진입했을때");
+  public Mono<String> welcome(DapTalkWlcmReqDto dapTalkWlcmReqDto) {
+    String uri = "chatflow/welcome.do";
+    return requestDaptalk(uri, dapTalkWlcmReqDto);
   }
 
   /** Engine */
-  public String engine(DapTalkEngineReqDto dapTalkEngineReqDto) {
-    return extractJson(dapTalkEngineReqDto.getInput_sentence());
+  public Mono<String> engine(DapTalkEngineReqDto dapTalkEngineReqDto) {
+    String uri = "chatflow/engine.do";
+    return requestDaptalk(uri, dapTalkEngineReqDto);
   }
 
-  //    /**
-  //     * 임시로 json 파일 처리
-  //     * @param input_sentence
-  //     * @return String
-  //     */
-  //    public String extractJson(String input_sentence) {
-  //
-  //        // JSON 파일 경로
-  //        String filePath = "frontend/test.json";
-  //
-  //        // JSON 파일 읽기
-  //        try {
-  //            // ObjectMapper 객체 생성
-  //            ObjectMapper objectMapper = new ObjectMapper();
-  //
-  //            // 파일을 읽어 JsonNode로 변환
-  //            JsonNode rootNode = objectMapper.readTree(new File(filePath));
-  //
-  //            // 'responseSet' 배열을 읽음
-  //            JsonNode responseSet = rootNode.get("responseSet");
-  //
-  //            // 'result' 배열을 읽음
-  //            JsonNode result1 = responseSet.get(RESULT);
-  //
-  //            // 'result' 배열을 읽음
-  //            JsonNode results = result1.get(RESULT);
-  //
-  //            // 배열에서 input_sentence가 일치하는 항목을 찾기
-  //            for (JsonNode result : results) {
-  //                String inputSentence = result.get("input_sentence").asText();
-  //                if (inputSentence.equals(input_sentence)) {
-  //                    // result에서 RESULT 필드 가져오기
-  //                    JsonNode resultNode = result.get(RESULT);
-  //                    // 결과를 JSON 문자열로 변환하여 반환
-  //                    return objectMapper.writeValueAsString(resultNode);
-  //                }
-  //            }
-  //
-  //        } catch (IOException e) {
-  //            throw new RuntimeException(e);
-  //        }
-  //
-  //        return null;
-  //    }
+  /** EventFlow 호출 */
+  public Mono<String> event(DapTalkReqParametersDto dapTalkReqParametersDto) {
+    String uri = "chatflow/v2/api/eventFlow.do";
+    return requestDaptalk(uri, dapTalkReqParametersDto);
+  }
+
+  /** EventFlow 호출 */
+  public Mono<String> userChatHist(DapTalkUsrChtHistDto dapTalkUsrChtHistDto) {
+    String uri = "chatflow/userChatHist.do";
+    return requestDaptalk(uri, dapTalkUsrChtHistDto);
+  }
+
+  /** 사용자 평가 호출 */
+  public Mono<String> evaluateMsg(DapTalkEvltMsgDto dapTalkEvltMsgDto) {
+    String uri = "chatflow/evaluateMsg.do";
+    return requestDaptalk(uri, dapTalkEvltMsgDto);
+  }
 
   /**
    * 임시로 json 파일 처리
@@ -147,5 +134,25 @@ public class DapTalkResService {
 
     // 만약 해당 input_sentence가 없을 경우 빈 문자열 반환
     return "{}";
+  }
+
+  public Mono<String> requestDaptalk(String uri, Object object) {
+    return webClient
+        .post()
+        .uri(EXTERNAL_API_BASE_URL + uri)
+        .bodyValue(object)
+        .retrieve()
+        .bodyToMono(String.class)
+        .map(
+            json -> {
+              try {
+                JsonNode root = objectMapper.readTree(json).get("responseSet").get("result");
+                return objectMapper.writeValueAsString(root);
+              } catch (JsonProcessingException e) {
+                log.error("Json is not valid : {}", e.getMessage());
+              }
+              return json;
+            })
+        .doOnNext(response -> log.info("Response Body: {}", response));
   }
 }

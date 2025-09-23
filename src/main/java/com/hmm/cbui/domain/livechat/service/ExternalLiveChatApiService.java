@@ -4,12 +4,15 @@ package com.hmm.cbui.domain.livechat.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import com.hmm.cbui.domain.livechat.dto.LiveChatRequestDto;
 import com.hmm.cbui.domain.livechat.dto.LiveChatResponseDto;
 import com.hmm.cbui.domain.livechat.dto.LiveChatRoomDto;
 import com.hmm.cbui.domain.livechat.dto.LiveChatUserDto;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -108,84 +111,84 @@ public class ExternalLiveChatApiService {
 
   private LiveChatResponseDto mockSendMessageResponse(LiveChatRequestDto request) {
     return LiveChatResponseDto.builder()
-            .messageId(UUID.randomUUID().toString())
-            .roomId(request.getRoomId())
-            .sender(request.getSender())
-            .content(request.getContent())
-            .messageType(request.getMessageType() != null ? request.getMessageType() : "TEXT")
-            .timestamp(LocalDateTime.now())
-            .status("SENT")
-            .replyTo(request.getReplyTo())
-            .metadata(request.getMetadata())
-            .isEdited(false)
-            .build();
+        .messageId(UUID.randomUUID().toString())
+        .roomId(request.getRoomId())
+        .sender(request.getSender())
+        .content(request.getContent())
+        .messageType(request.getMessageType() != null ? request.getMessageType() : "TEXT")
+        .timestamp(LocalDateTime.now())
+        .status("SENT")
+        .replyTo(request.getReplyTo())
+        .metadata(request.getMetadata())
+        .isEdited(false)
+        .build();
   }
 
   private List<LiveChatResponseDto> mockGetMessagesResponse(String roomId, int limit) {
     return List.of(
-            LiveChatResponseDto.builder()
-                    .messageId(UUID.randomUUID().toString())
-                    .roomId(roomId)
-                    .sender("user1")
-                    .content("안녕하세요! 라이브챗 테스트입니다.")
-                    .messageType("TEXT")
-                    .timestamp(LocalDateTime.now().minusMinutes(5))
-                    .status("READ")
-                    .isEdited(false)
-                    .build(),
-            LiveChatResponseDto.builder()
-                    .messageId(UUID.randomUUID().toString())
-                    .roomId(roomId)
-                    .sender("user2")
-                    .content("네, 안녕하세요! 잘 작동하고 있네요.")
-                    .messageType("TEXT")
-                    .timestamp(LocalDateTime.now().minusMinutes(3))
-                    .status("READ")
-                    .isEdited(false)
-                    .build());
+        LiveChatResponseDto.builder()
+            .messageId(UUID.randomUUID().toString())
+            .roomId(roomId)
+            .sender("user" + limit)
+            .content("안녕하세요! 라이브챗 테스트입니다.")
+            .messageType("TEXT")
+            .timestamp(LocalDateTime.now().minusMinutes(5))
+            .status("READ")
+            .isEdited(false)
+            .build(),
+        LiveChatResponseDto.builder()
+            .messageId(UUID.randomUUID().toString())
+            .roomId(roomId)
+            .sender("user2")
+            .content("네, 안녕하세요! 잘 작동하고 있네요.")
+            .messageType("TEXT")
+            .timestamp(LocalDateTime.now().minusMinutes(3))
+            .status("READ")
+            .isEdited(false)
+            .build());
   }
 
   private LiveChatRoomDto mockGetRoomInfoResponse(String roomId) {
     return LiveChatRoomDto.builder()
-            .roomId(roomId)
-            .roomName("테스트 채팅방")
-            .description("라이브챗 API 테스트용 채팅방입니다")
-            .status("ACTIVE")
-            .createdBy("admin")
-            .createdAt(LocalDateTime.now().minusDays(1))
-            .updatedAt(LocalDateTime.now().minusMinutes(10))
-            .participants(List.of("user1", "user2", "user3"))
-            .participantCount(3)
-            .lastMessage("네, 안녕하세요! 잘 작동하고 있네요.")
-            .lastMessageAt(LocalDateTime.now().minusMinutes(3))
-            .build();
+        .roomId(roomId)
+        .roomName("테스트 채팅방")
+        .description("라이브챗 API 테스트용 채팅방입니다")
+        .status("ACTIVE")
+        .createdBy("admin")
+        .createdAt(LocalDateTime.now().minusDays(1))
+        .updatedAt(LocalDateTime.now().minusMinutes(10))
+        .participants(List.of("user1", "user2", "user3"))
+        .participantCount(3)
+        .lastMessage("네, 안녕하세요! 잘 작동하고 있네요.")
+        .lastMessageAt(LocalDateTime.now().minusMinutes(3))
+        .build();
   }
 
   private LiveChatUserDto mockGetUserInfoResponse(String userId) {
     return LiveChatUserDto.builder()
-            .userId(userId)
-            .userName("user" + userId)
-            .displayName("사용자 " + userId)
-            .email("user" + userId + "@example.com")
-            .avatar("https://example.com/avatar/" + userId + ".jpg")
-            .status("ONLINE")
-            .lastSeen(LocalDateTime.now().minusMinutes(1))
-            .role("USER")
-            .isActive(true)
-            .build();
+        .userId(userId)
+        .userName("user" + userId)
+        .displayName("사용자 " + userId)
+        .email("user" + userId + "@example.com")
+        .avatar("https://example.com/avatar/" + userId + ".jpg")
+        .status("ONLINE")
+        .lastSeen(LocalDateTime.now().minusMinutes(1))
+        .role("USER")
+        .isActive(true)
+        .build();
   }
 
   private LiveChatRoomDto mockCreateRoomResponse(LiveChatRoomDto roomRequest) {
     return LiveChatRoomDto.builder()
-            .roomId(UUID.randomUUID().toString())
-            .roomName(roomRequest.getRoomName())
-            .description(roomRequest.getDescription())
-            .status("ACTIVE")
-            .createdBy(roomRequest.getCreatedBy())
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
-            .participants(List.of(roomRequest.getCreatedBy()))
-            .participantCount(1)
-            .build();
+        .roomId(UUID.randomUUID().toString())
+        .roomName(roomRequest.getRoomName())
+        .description(roomRequest.getDescription())
+        .status("ACTIVE")
+        .createdBy(roomRequest.getCreatedBy())
+        .createdAt(LocalDateTime.now())
+        .updatedAt(LocalDateTime.now())
+        .participants(List.of(roomRequest.getCreatedBy()))
+        .participantCount(1)
+        .build();
   }
 }

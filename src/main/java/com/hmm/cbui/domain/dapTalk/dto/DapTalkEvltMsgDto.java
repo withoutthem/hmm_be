@@ -10,10 +10,10 @@ import lombok.Setter;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 @SuppressWarnings("checkstyle:MemberName")
-// 답톡 웰컴 요청 API용 DTO
-public class DapTalkWlcmReqDto {
-
-  private String chatbot_id; // 챗봇ID
-  private String user_id; // 사용자ID
-  private DapTalkReqParametersDto parameters; // 파라미터
+// 대화평가 API용 DTO
+public class DapTalkEvltMsgDto {
+  private String chatbot_id;
+  private String ins_id;
+  private String evaluate_flag;
+  private String evaluate_message;
 }

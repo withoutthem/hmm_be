@@ -10,15 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * 챗봇 목록 조회 Dto
- *
- * @author jym
- * @since 2025.09.03
- */
 @Getter
 @Setter
-public class DapTalkChtbCatlgu {
+public class DapTalkChtbMngtDto {
 
   private String tenantId; // 테넌트ID
   private String tenantName; // 테넌트명 - 임시 => 추후 삭제

@@ -119,12 +119,13 @@ public class WebClientConfig {
             ExchangeFilterFunction.ofResponseProcessor(
                 clientResponse -> {
                   log.info(">>>>>>>>>> RESPONSE <<<<<<<<<<");
+                  log.info("Response Status :  {} ", clientResponse.statusCode());
                   clientResponse
                       .headers()
                       .asHttpHeaders()
                       .forEach(
                           (name, values) ->
-                              values.forEach(value -> log.info("{} {}", name, value)));
+                              values.forEach(value -> log.info("{} : {}", name, value)));
                   return Mono.just(clientResponse);
                 }))
         .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE) // 기본 헤더설정

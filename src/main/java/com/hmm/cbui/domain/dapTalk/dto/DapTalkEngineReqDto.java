@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @SuppressWarnings("checkstyle:MemberName")
+// 답톡 엔진 요청API용 DTO
 public class DapTalkEngineReqDto {
 
   private String version; // 버전

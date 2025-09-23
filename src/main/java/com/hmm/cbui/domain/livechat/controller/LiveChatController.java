@@ -1,16 +1,32 @@
 /* (C) 2025 HMM Corp. All rights reserved. */
 package com.hmm.cbui.domain.livechat.controller;
 
-import org.springframework.web.bind.annotation.*;
 import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import com.hmm.cbui.domain.livechat.dto.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hmm.cbui.domain.livechat.dto.ApiResponseDto;
+import com.hmm.cbui.domain.livechat.dto.LiveChatMessageDto;
+import com.hmm.cbui.domain.livechat.dto.LiveChatRequestDto;
+import com.hmm.cbui.domain.livechat.dto.LiveChatResponseDto;
+import com.hmm.cbui.domain.livechat.dto.LiveChatRoomDto;
+import com.hmm.cbui.domain.livechat.dto.LiveChatUserDto;
 import com.hmm.cbui.domain.livechat.service.ExternalLiveChatApiService;
 import com.hmm.cbui.domain.livechat.service.LiveChatService;
+
 import jakarta.validation.Valid;
-import reactor.core.publisher.Mono;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 /** 라이브챗 REST API 컨트롤러 클라이언트와 외부 API 간의 중계 역할 */
 @Slf4j
